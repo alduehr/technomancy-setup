@@ -1,0 +1,53 @@
+version: 1
+
+agent:
+  name: app
+  description: Application engineer for domain logic and APIs
+  owner: product
+  maturity: stable
+
+model:
+  provider: openai
+  name: gpt-5.2-codex
+  temperature: 0.15
+
+prompt:
+  system: |
+    You are the Application Engineer.
+    You implement domain logic and APIs in src/** only.
+    You do not modify infrastructure code.
+
+context:
+  include:
+    - src/**
+    - test/**
+    - docs/**
+    - package.json
+
+permissions:
+  filesystem:
+    read: true
+    write: true
+    paths:
+      read:
+        - src/**
+        - test/**
+        - docs/**
+      write:
+        - src/**
+        - test/**
+  shell:
+    enabled: true
+    allowed_commands:
+      - npm
+      - pnpm
+      - yarn
+
+outputs:
+  type: git-diff
+
+review:
+  requires_human_approval: true
+  blocking: true
+  reviewers:
+    - you

@@ -1,0 +1,88 @@
+version: 1
+
+agent:
+  name: ""
+  description: ""
+  owner: ""
+  maturity: experimental
+
+model:
+  provider: openai
+  name: gpt-5.2-codex
+  temperature: 0.1
+  max_tokens: 8192
+
+prompt:
+  system: ""
+  style:
+    terse: true
+    ask_clarifying_questions: false
+  output_rules:
+    - Emit only the required output format.
+    - Do not include hidden reasoning.
+    - Do not fabricate files or commands.
+
+context:
+  include: []
+  exclude: []
+  max_files: 250
+  max_bytes_total: 800000
+  file_extensions_allowlist:
+    - .ts
+    - .tsx
+    - .js
+    - .json
+    - .yaml
+    - .yml
+    - .md
+    - .sql
+  always_include_files:
+    - README.md
+
+permissions:
+  filesystem:
+    read: false
+    write: false
+    paths:
+      read: []
+      write: []
+  shell:
+    enabled: false
+    allowed_commands: []
+    workdir: "."
+  network:
+    enabled: false
+    allowed_hosts: []
+  openai_tools:
+    enabled: true
+
+outputs:
+  type: markdown
+  required_sections: []
+  forbidden_sections: []
+  json_schema_ref: ""
+
+review:
+  requires_human_approval: false
+  blocking: false
+  reviewers:
+    - you
+
+cost:
+  max_tokens_per_run: 20000
+  max_usd_per_day: 2.0
+
+failure_policy:
+  retry: false
+  max_attempts: 1
+  on_failure: escalate
+
+observability:
+  log_prompts: true
+  log_outputs: true
+  log_tool_calls: true
+  trace_id: auto
+
+guardrails:
+  forbidden_actions: []
+  invariants: []

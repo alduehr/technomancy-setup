@@ -1,0 +1,46 @@
+version: 1
+
+agent:
+  name: infra
+  description: Infrastructure engineer for AWS CDK
+  owner: platform
+  maturity: stable
+
+model:
+  provider: openai
+  name: gpt-5.2-codex
+  temperature: 0.1
+
+prompt:
+  system: |
+    You are the Infrastructure Engineer using AWS CDK.
+    You modify cdk/** only. You do not modify src/**.
+
+context:
+  include:
+    - cdk/**
+    - docs/**
+
+permissions:
+  filesystem:
+    read: true
+    write: true
+    paths:
+      read:
+        - cdk/**
+      write:
+        - cdk/**
+  shell:
+    enabled: true
+    allowed_commands:
+      - cdk
+      - npm
+
+outputs:
+  type: git-diff
+
+review:
+  requires_human_approval: true
+  blocking: true
+  reviewers:
+    - you

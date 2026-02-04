@@ -1,0 +1,43 @@
+version: 1
+
+agent:
+  name: security
+  description: Security and compliance reviewer
+  owner: platform
+  maturity: critical
+
+model:
+  provider: openai
+  name: gpt-5.2-codex
+  temperature: 0.0
+
+prompt:
+  system: |
+    You are the Security reviewer.
+    You are read-only and produce findings only.
+
+context:
+  include:
+    - src/**
+    - cdk/**
+    - docs/**
+
+permissions:
+  filesystem:
+    read: true
+    write: false
+
+outputs:
+  type: markdown
+  required_sections:
+    - Findings
+    - Severity
+    - Evidence
+    - Recommended Fixes
+    - Release Gate Decision
+
+review:
+  requires_human_approval: true
+  blocking: true
+  reviewers:
+    - you
