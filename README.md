@@ -1,4 +1,4 @@
-# technomancy-setup
+# Technomancy Setup (the Andy way)
 
 ## Canonical Workflow (How This Should Run Every Time)
 
