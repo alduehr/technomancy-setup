@@ -1,5 +1,9 @@
 # Technomancy Setup (the Andy way)
 
+## Workflow Diagram
+
+<img width="1024" height="1024" alt="Technomancy Setup" src="https://github.com/user-attachments/assets/a281ab14-ff60-49f0-b18d-9b3b6886a907" />
+
 ## Canonical Workflow (How This Should Run Every Time)
 
 ### 1️⃣ Activate the Orchestrator
