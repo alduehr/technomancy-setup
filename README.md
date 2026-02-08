@@ -8,25 +8,28 @@
 
 ## Canonical Workflow (How This Should Run Every Time)
 
-### 1️⃣ Activate the Orchestrator
+### 1. Activate the Orchestrator
 
 You start all large or ambiguous workflows by activating the Orchestrator.
 
 You give it a high-level goal, for example:
 
-“Build authentication using Cognito Hosted UI and Google, and integrate it into the existing architecture.”
+"Build authentication using Cognito Hosted UI and Google, and integrate it into the existing architecture."
 
 You do not activate the Planner directly for large work.
 
+The Orchestrator is the entry point and owns coordination, not implementation.
+
 ---
 
-### 2️⃣ Orchestrator Validates Permissions (Manager if needed)
+### 2. Orchestrator Validates Permissions (Manager if needed)
 
 Before any planning or execution:
 
-- The Orchestrator checks `AGENT_PERMISSIONS.md`
-- If the file does not exist, the Orchestrator immediately invokes the Manager
-- If new folders, domains, or concerns are introduced, the Orchestrator invokes the Manager to update permissions
+- The Orchestrator ensures agent permissions exist
+- If `AGENT_PERMISSIONS.md` does not exist, the Orchestrator immediately invokes the Manager
+- If the requested work introduces new folders, domains, or concerns, the Orchestrator invokes the Manager to update permissions
+- The Orchestrator does not proceed until permissions cover the planned work
 
 The Manager is the sole authority allowed to create or modify `AGENT_PERMISSIONS.md`.
 
@@ -34,55 +37,90 @@ No other agent may change permissions.
 
 ---
 
-### 3️⃣ Orchestrator Invokes the Planner
+### 3. Orchestrator Invokes the Planner (Always)
 
-The Orchestrator’s job at this stage is not to design solutions.
+The Orchestrator does not design solutions.
 
-Instead, it asks the Planner to determine:
+It always invokes the Planner first, for every request it handles.
 
-- What work needs to be done?
-- In what order?
-- Which agents are required?
-- What can be parallelized vs serialized?
-- What constraints matter (architecture, UX, security, permissions)?
+The Planner determines:
+
+- What work needs to be done
+- In what order
+- Which agents are required
+- What can be parallelized vs serialized
+- What constraints matter (architecture, UX, security, permissions)
 
 The Planner produces:
 
 - A structured plan
 - Ordered phases
-- Explicit agent responsibilities
-- Clear deliverables per phase
+- Explicit agent ownership per phase
+- Clear deliverables
+- Identified permission requirements
 
 The Planner does not execute anything.
+The Planner does not propose code.
+The Planner does not make architecture or UX decisions.
 
 ---
 
-### 4️⃣ Orchestrator Executes the Plan
+### 4. Orchestrator Executes the Plan (By Delegation Only)
 
-Once a plan exists, the Orchestrator executes it.
+Once a plan exists and permissions are validated, the Orchestrator executes the plan strictly by delegation.
 
 The Orchestrator:
 
-- Calls Architect for architecture decisions
-- Calls Infra for CDK / cloud changes
-- Calls UX to define real user behavior
-- Calls App for application logic
-- Calls Security to validate trust boundaries and auth
-- Calls QA to sanity-check outcomes
+- Routes architecture decisions to Architect
+- Routes infrastructure work to Infra
+- Routes user experience definition to UX
+- Routes business logic implementation to App
+- Routes validation to QA and Security
 
-The Orchestrator also:
+The Orchestrator:
 
 - Enforces execution order
-- Resolves conflicts between agents
-- Prevents agents from overreaching their role
+- Ensures agents stay within their role boundaries
+- Prevents scope expansion
 - Ensures permissions are respected
-- Produces the final integrated output
+
+The Orchestrator does not:
+
+- Write code
+- Modify files
+- Run commands
+- Diagnose bugs
+- Make technical judgments
+
+It coordinates. It does not build.
 
 ---
 
-### 5️⃣ Acceptance Gate (Business Value Check)
+### 5. Mandatory Review Gates (Before Completion)
 
-Before work is considered “done”, the Orchestrator invokes Acceptance.
+Before work is considered complete, the Orchestrator invokes all review agents.
+
+These are hard gates, not suggestions.
+
+#### QA Gate
+
+QA verifies:
+
+- Correctness
+- Regressions
+- Sanity
+- Alignment with the plan
+
+#### Security Gate
+
+Security verifies:
+
+- Authentication handling
+- Trust boundaries
+- Data exposure
+- Least-privilege assumptions
+
+#### Acceptance Gate (Business Value Check)
 
 Acceptance answers questions like:
 
@@ -91,7 +129,13 @@ Acceptance answers questions like:
 - Is the UI modeling user intent, or just calling APIs?
 - Would a reasonable user consider this usable?
 
-If Acceptance fails, the Orchestrator loops back to the appropriate phase.
+If any reviewer fails:
+
+- The Orchestrator converts findings into concrete fix tasks
+- Routes them back to the responsible execution agent
+- Re-runs the relevant review gates after fixes
+
+The Orchestrator cannot override or reinterpret review results.
 
 ---
 
@@ -107,26 +151,27 @@ Common failure modes include:
 
 - Unconventional delivery patterns
 - Demo-style UIs
-- “Click a button → dump JSON”
+- "Click a button -> dump JSON"
 - Infrastructure decisions leaking upward into UX
+- Execution starting before permissions are clear
 
 ---
 
-### With Orchestrator → Planner → Agents → Acceptance
+### With Orchestrator -> Planner -> Agents -> Acceptance
 
 - Intent flows top-down
-- Permissions are enforced explicitly
-- Architecture and UX constraints are applied early
-- Execution remains aligned with the original plan
+- Permissions are explicit and enforced
+- Architecture and UX constraints are owned by the right agents
+- Execution remains aligned with the plan
 - Business value is validated before completion
-- Agents can be reused across projects
+- Agents are reusable across projects
 
 This mirrors proven patterns used in:
 
 - Build systems
 - CI pipelines
 - Production AI agent frameworks
-- Human engineering organizations (PM → EM → teams)
+- Human engineering organizations (PM -> EM -> teams)
 
 ---
 
@@ -134,19 +179,26 @@ This mirrors proven patterns used in:
 
 ### Orchestrator (ENTRY POINT)
 
-- This is the agent you talk to
-- Owns execution and coordination
-- Enforces permissions and order
-- First call is usually the Planner
-- Final call is Acceptance
+- The agent you talk to
+- Owns coordination and execution flow
+- Always invokes the Planner
+- Ensures permissions exist before work begins
+- Routes work to the correct agents
+- Enforces review gates
+- Never implements or diagnoses
+
+Think: delivery manager, not senior IC.
 
 ---
 
 ### Planner
 
-- Produces plans, phases, and task graphs
+- Produces structured plans and phase graphs
+- Identifies agent ownership and sequencing
+- Identifies permission requirements
 - No implementation
-- No architecture decisions beyond sequencing
+- No design decisions
+- No fixes
 
 ---
 
@@ -154,34 +206,34 @@ This mirrors proven patterns used in:
 
 - Owns `AGENT_PERMISSIONS.md`
 - Sole agent allowed to edit permissions
-- Defines which agents can touch which areas
-- Invoked automatically when scope changes
-
----
-
-### Infra
-
-- Owns infrastructure implementation
-- Implements the architecture decisions from Architect
-- Keeps infra modern and standard
-- Optimizes for your goals
-- Produces deployable CDK changes
+- Applies least-privilege changes
+- Invoked automatically when scope or structure changes
 
 ---
 
 ### Architect
 
-- Decides patterns, boundaries, and constraints
-- Steers away from unconventional or fragile designs
+- Defines patterns, boundaries, and constraints
+- Steers away from fragile or unconventional designs
 - Aligns with common, accepted architectures
-- Pushes back on “clever but wrong” designs
+- Pushes back on clever-but-wrong ideas
+
+---
+
+### Infra
+
+- Implements infrastructure changes
+- Uses common, modern cloud patterns
+- Avoids documented infrastructure anti-patterns
+- Favors scalable, low-cost defaults
+- Produces deployable infrastructure artifacts
 
 ---
 
 ### UX
 
-- Translates domain goals into real UI behavior
-- Produces “this feels like a real app” outcomes
+- Translates domain goals into real user behavior
+- Designs screens, flows, and interactions that feel like a real product
 - Rejects demo or API-shaped UIs
 - Encourages experience APIs over stateful frontends
 
@@ -191,20 +243,22 @@ This mirrors proven patterns used in:
 
 - Implements business logic
 - Assumes architecture and UX decisions are already settled
+- Does not invent patterns or workflows
 
 ---
 
 ### Security
 
-- Validates authentication, trust boundaries, and data exposure
-- Ensures auth is handled in the right layer
+- Validates authentication and authorization handling
+- Reviews trust boundaries and data exposure
+- Ensures security concerns are addressed in the correct layer
 
 ---
 
 ### QA
 
 - Verifies correctness, regressions, and sanity
-- Ensures outputs match the plan
+- Confirms outputs match the plan and expectations
 
 ---
 
@@ -218,11 +272,11 @@ This mirrors proven patterns used in:
 
 ## Rule of Thumb
 
-Small, focused task → you may invoke a specialist agent directly  
-Large or ambiguous work → always invoke the Orchestrator
+Small, focused task -> you may invoke a specialist agent directly  
+Large or ambiguous work -> always invoke the Orchestrator
 
 If you ever find yourself thinking:
 
-“I’m not sure which agent to start with…”
+"I'm not sure which agent to start with..."
 
-That’s your signal to start with the Orchestrator.
+That is your signal to start with the Orchestrator.
