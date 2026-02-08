@@ -3,6 +3,8 @@
 This file defines which agents may modify which parts of the repository.
 It is intentionally simple and uses least-privilege defaults.
 
+**NOTE: This is an example permissions file.  The manager should update this based on the project and delete this line at that time**
+
 ## Rules
 
 - Orchestrator and Planner must read this file before doing any work.
