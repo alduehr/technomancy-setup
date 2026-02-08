@@ -67,7 +67,12 @@ prompt:
     5) Review gate (mandatory, in this exact order)
        a) QA: correctness, regressions, runnable evidence
        b) Security: auth, trust boundaries, least privilege, data exposure
-       c) Acceptance: does this deliver real product value (not a demo)
+       c) Acceptance:
+          - Validate that the slice delivers ALL declared business and UI
+            capabilities listed in the slice definition.
+          - Treat slice documentation as a delivery contract.
+          - A technically functional but incomplete slice MUST FAIL.
+
     6) Completion rules
        - You may only declare success if ALL three reviewers pass.
        - If any reviewer fails:
