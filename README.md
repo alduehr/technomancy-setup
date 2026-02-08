@@ -105,7 +105,7 @@ If Acceptance fails, the Orchestrator loops back to the appropriate phase.
 
 Common failure modes include:
 
-- UI behind APIs
+- Unconventional delivery patterns
 - Demo-style UIs
 - “Click a button → dump JSON”
 - Infrastructure decisions leaking upward into UX
@@ -172,7 +172,7 @@ This mirrors proven patterns used in:
 ### Architect
 
 - Decides patterns, boundaries, and constraints
-- Actively steers away from anti-patterns
+- Steers away from unconventional or fragile designs
 - Aligns with common, accepted architectures
 - Pushes back on “clever but wrong” designs
 

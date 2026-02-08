@@ -43,8 +43,8 @@ If it doesn't exist, Orchestrator must invoke Manager to create it.
 - Drives screen flows and recommends Experience APIs (BFF) to keep the UI lean
 
 ### Infra
-- Implements AWS/CDK changes
-- Standard patterns (CDN static UI, API gateway, managed auth)
+- Implements AWS/CDK changes following common, production-grade patterns
+- Defaults to managed/serverless services, least-privilege IAM, and low idle cost unless the plan says otherwise
 
 ### App
 - Implements application logic and API/Experience API shapes
