@@ -1,88 +1,33 @@
-version: 1
+# Technomancy Agent File Schema (v1)
 
-agent:
-  name: ""
-  description: ""
-  owner: ""
-  maturity: experimental
+This repo uses YAML agent definition files to configure multi-agent execution.
 
-model:
-  provider: openai
-  name: gpt-5.2-codex
-  temperature: 0.1
-  max_tokens: 8192
+## Core fields
 
-prompt:
-  system: ""
-  style:
-    terse: true
-    ask_clarifying_questions: false
-  output_rules:
-    - Emit only the required output format.
-    - Do not include hidden reasoning.
-    - Do not fabricate files or commands.
+- `version`: schema version (integer)
+- `agent`:
+  - `name`: short stable agent id (string)
+  - `description`: what the agent does (string, multi-line ok)
+  - `owner`: owning team or scope (string)
+  - `maturity`: e.g. experimental | beta | critical (string)
+- `model`:
+  - `provider`: model provider (string)
+  - `name`: model id (string)
+  - `temperature`: float
+  - `max_tokens`: integer
+- `prompt`:
+  - `system`: system prompt (multi-line string)
 
-context:
-  include: []
-  exclude: []
-  max_files: 250
-  max_bytes_total: 800000
-  file_extensions_allowlist:
-    - .ts
-    - .tsx
-    - .js
-    - .json
-    - .yaml
-    - .yml
-    - .md
-    - .sql
-  always_include_files:
-    - README.md
+## Permissions model (project-agnostic)
 
-permissions:
-  filesystem:
-    read: false
-    write: false
-    paths:
-      read: []
-      write: []
-  shell:
-    enabled: false
-    allowed_commands: []
-    workdir: "."
-  network:
-    enabled: false
-    allowed_hosts: []
-  openai_tools:
-    enabled: true
+Agents are intentionally reusable across projects. Path permissions are **not**
+embedded in agent YAML files.
 
-outputs:
-  type: markdown
-  required_sections: []
-  forbidden_sections: []
-  json_schema_ref: ""
+Instead, the repo root contains:
 
-review:
-  requires_human_approval: false
-  blocking: false
-  reviewers:
-    - you
+- `AGENT_PERMISSIONS.md`
 
-cost:
-  max_tokens_per_run: 20000
-  max_usd_per_day: 2.0
+The Orchestrator and Planner MUST read and obey this file before work begins.
+If it does not exist, Orchestrator MUST invoke the Manager agent to create it.
 
-failure_policy:
-  retry: false
-  max_attempts: 1
-  on_failure: escalate
-
-observability:
-  log_prompts: true
-  log_outputs: true
-  log_tool_calls: true
-  trace_id: auto
-
-guardrails:
-  forbidden_actions: []
-  invariants: []
+The Manager agent is the only agent allowed to edit `AGENT_PERMISSIONS.md`.

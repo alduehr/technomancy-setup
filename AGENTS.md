@@ -1,24 +1,65 @@
-# Codex Technomancy Instructions
+# Technomancy Agents
 
-This repository uses a technomancy workflow.
+This repository uses a reusable, project-agnostic multi-agent system.
 
-Agents are defined in:
-- /agents/*.yaml
+## Entry point
 
-Available agents:
-- architect
-- app
-- infra
-- planner
-- security
-- qa
-- ux
+For any large or ambiguous task, activate **Orchestrator**.
 
-Rules:
-- Agents must respect role boundaries defined in YAML.
-- Agents must respect filesystem scope in YAML.
-- Output formats must match YAML contracts.
-- Local changes do not require human approval; pushing to GitHub does.
-- Do not mix roles in a single task.
+Orchestrator will:
+1. Ensure permissions exist (via **Manager** and `AGENT_PERMISSIONS.md`)
+2. Invoke **Planner** to produce a phased plan
+3. Execute the plan by delegating to specialist agents
+4. Enforce architecture + UX guardrails early
+5. Invoke **Acceptance**, **Security**, and **QA** before declaring completion
 
-When asked to act as an agent, behave strictly as that agent.
+## Permissions
+
+Permissions are not embedded in agent YAML files.
+
+They live in a repo-root file:
+
+- `AGENT_PERMISSIONS.md`
+
+Orchestrator and Planner must read and obey this file before work begins.
+If it doesn't exist, Orchestrator must invoke Manager to create it.
+
+## Agents
+
+### Orchestrator
+- Executes work end-to-end by invoking other agents
+- Enforces order, resolves conflicts, produces integrated output
+
+### Planner
+- Planning-only
+- Produces phased plans, task graphs, deliverables, validation steps
+
+### Architect
+- Defines boundaries, constraints, and standard patterns
+- Prevents architectural drift
+
+### UX
+- Produces real, modern UI behavior that feels like a real app
+- Drives screen flows and recommends Experience APIs (BFF) to keep the UI lean
+
+### Infra
+- Implements AWS/CDK changes
+- Standard patterns (CDN static UI, API gateway, managed auth)
+
+### App
+- Implements application logic and API/Experience API shapes
+- Keeps business logic server-side
+
+### Security
+- Validates auth, trust boundaries, least privilege, data exposure
+
+### QA
+- Automated + manual validation, regression checks, deploy readiness
+
+### Acceptance
+- Product acceptance testing
+- Flags "demo" outcomes and ensures the slice provides real user value
+
+### Manager
+- Owns permissions only
+- May edit **only** `AGENT_PERMISSIONS.md`

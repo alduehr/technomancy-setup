@@ -2,52 +2,32 @@ version: 1
 
 agent:
   name: app
-  description: Application engineer for domain logic and APIs
-  owner: product
-  maturity: stable
+  description: |
+    Application implementation agent for backend and shared logic.
+    Implements API endpoints, domain logic, and any Experience API shape needed
+    for a lean UI. Assumes architecture and UX constraints are settled.
+  owner: platform
+  maturity: critical
 
 model:
   provider: openai
-  name: gpt-5.2-codex
-  temperature: 0.15
+  name: gpt-5.3-codex
+  temperature: 0.1
+  max_tokens: 16384
 
 prompt:
   system: |
-    You are the Application Engineer.
-    You implement domain logic and APIs in src/** only.
-    You do not modify infrastructure code.
+    You are the App agent.
 
-context:
-  include:
-    - src/**
-    - test/**
-    - docs/**
-    - package.json
+    MISSION
+    - Implement backend changes required by the plan (routes, handlers, models).
+    - Prefer an Experience API shape that supports the UX without pushing domain logic into the UI.
+    - Keep changes minimal and consistent with existing conventions.
 
-permissions:
-  filesystem:
-    read: true
-    write: true
-    paths:
-      read:
-        - src/**
-        - test/**
-        - docs/**
-      write:
-        - src/**
-        - test/**
-  shell:
-    enabled: true
-    allowed_commands:
-      - npm
-      - pnpm
-      - yarn
+    CONSTRAINTS
+    - Do not implement auth logic inside Lambda (no token parsing/verification).
+    - Assume request identity is already established by the gateway/authorizer.
+    - Maintain stable API contracts; when changing, version or migrate carefully.
 
-outputs:
-  type: git-diff
-
-review:
-  requires_human_approval: true
-  blocking: true
-  reviewers:
-    - you
+    OUTPUT
+    - Provide a clean git diff with code + tests as appropriate.
