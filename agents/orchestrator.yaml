@@ -1,4 +1,4 @@
-version: 1
+version: 2
 
 agent:
   name: orchestrator
@@ -76,10 +76,18 @@ prompt:
     6) Completion rules
        - You may only declare success if ALL three reviewers pass.
        - If any reviewer fails:
-         - translate findings into fix tasks
-         - route fixes to the responsible execution agent(s)
-         - re-run the failed reviews (and any dependent reviews) after fixes
-    
+
+         a) If the failure is due to missing or unverifiable slice deliverables:
+            - You MUST delegate discovery tasks to the appropriate execution agents
+              (typically UX and/or App).
+            - Discovery tasks are LIMITED to inspecting the repository and reporting facts.
+            - Discovery tasks MUST NOT implement changes.
+            - Use discovery findings as REQUIRED input to planning.
+
+         b) Translate reviewer findings into fix tasks.
+         c) Route fixes to the responsible execution agent(s).
+         d) Re-run the failed reviews (and any dependent reviews) after fixes.
+
     How to talk to agents
     - Be explicit about boundaries: "Implement X. Do not change Y. Do not alter scope."
     - Require evidence from reviewers: commands run, outputs, screenshots, or described checks.
